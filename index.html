@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trailguess — Daily Camping Rig Guesser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal:#1F1B18;
+    --panel:#2A2521;
+    --sand:#E8DCC8;
+    --rust:#C1502E;
+    --olive:#6B7654;
+    --amber:#C79A3B;
+    --line:#443C35;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--charcoal);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:40px 40px;
+    background-attachment:fixed;
+    color:var(--sand);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:24px 16px 60px;
+  }
+  .wrap{width:100%;max-width:540px;}
+  header{text-align:center;margin-bottom:18px;}
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-size:28px;
+    margin:0 0 2px;
+  }
+  .sub{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--olive);
+    letter-spacing:1px;
+  }
+  .frame{
+    position:relative;
+    border:2px solid var(--rust);
+    aspect-ratio:4/3;
+    overflow:hidden;
+    background:#111;
+    margin-bottom:14px;
+  }
+  .frame::before, .frame::after{
+    content:"";
+    position:absolute;
+    width:22px;height:22px;
+    border:2px solid var(--sand);
+    opacity:.6;
+    z-index:2;
+    pointer-events:none;
+  }
+  .frame::before{top:6px;left:6px;border-right:none;border-bottom:none;}
+  .frame::after{bottom:6px;right:6px;border-left:none;border-top:none;}
+  .frame img{
+    position:absolute;
+    top:50%;left:50%;
+    width:100%;height:100%;
+    object-fit:cover;
+    transition:transform .5s ease;
+  }
+  .guess-tally{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--olive);
+    margin-bottom:16px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--olive);}
+  .dot.used{background:var(--rust);border-color:var(--rust);}
+  .field{margin-bottom:12px;}
+  .field label{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--olive);
+    margin-bottom:5px;
+  }
+  .row{display:flex;gap:8px;}
+  select{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--sand);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:10px 12px;
+    border-radius:2px;
+  }
+  select:focus{outline:none;border-color:var(--rust);}
+  select:disabled{opacity:.55;}
+  .result-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    padding:8px 10px;
+    border-radius:2px;
+    min-width:90px;
+    text-align:center;
+    display:flex;align-items:center;justify-content:center;
+    white-space:nowrap;
+  }
+  .result-tag.ok{background:rgba(107,118,84,.25);color:var(--olive);border:1px solid var(--olive);}
+  .result-tag.close{background:rgba(199,154,59,.22);color:var(--amber);border:1px solid var(--amber);}
+  .result-tag.bad{background:rgba(140,59,46,.25);color:var(--rust);border:1px solid var(--rust);}
+  .result-tag.empty{background:transparent;border:1px dashed var(--line);color:var(--line);}
+  button{
+    width:100%;
+    background:var(--rust);
+    color:var(--sand);
+    border:none;
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    font-size:15px;
+    padding:12px;
+    border-radius:2px;
+    cursor:pointer;
+    margin-top:6px;
+  }
+  button:disabled{background:var(--line);color:#777;cursor:not-allowed;}
+  .history{margin-top:20px;}
+  .history-row{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    display:grid;
+    grid-template-columns:20px 1fr 1fr 1fr;
+    gap:6px;
+    padding:6px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .history-row .ok{color:var(--olive);}
+  .history-row .close{color:var(--amber);}
+  .history-row .bad{color:var(--rust);}
+  .reveal{
+    margin-top:18px;
+    padding:16px;
+    background:var(--panel);
+    border-left:3px solid var(--rust);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    line-height:1.6;
+    display:none;
+  }
+  .reveal h2{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:16px;
+    margin:0 0 8px;
+    color:var(--rust);
+  }
+  .score{
+    font-family:'JetBrains Mono',monospace;
+    font-size:22px;
+    color:var(--amber);
+  }
+  .share{
+    font-family:'JetBrains Mono',monospace;
+    font-size:20px;
+    letter-spacing:4px;
+    margin:10px 0;
+  }
+  .err{
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    color:var(--olive);
+    padding:40px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Trailguess</h1>
+    <div class="sub" id="dateLabel">— loading —</div>
+  </header>
+  <div id="game"></div>
+</div>
+
+<script>
+const MAX_GUESSES = 5;
+const ZOOM_SCALES = [3.2, 2.5, 1.9, 1.4, 1]; // per guess index, most zoomed first
+
+let puzzle = null, vehicles = [], trips = [];
+let guessCount = 0;
+let history = [];
+let solved = { vehicle:false, era:false, trip:false };
+let solvedAtGuess = { vehicle:null, era:null, trip:null };
+
+async function init(){
+  const [pRes, vRes, tRes] = await Promise.all([
+    fetch('puzzles.json'), fetch('vehicles.json'), fetch('trips.json')
+  ]);
+  const data = await pRes.json();
+  vehicles = await vRes.json();
+  trips = await tRes.json();
+
+  const todayStr = getTodayPacificString();
+  document.getElementById('dateLabel').textContent = todayStr + ' Pacific · new rig daily at midnight PT';
+
+  puzzle = data.puzzles.find(p => p.date === todayStr);
+  if(!puzzle){
+    document.getElementById('game').innerHTML = '<div class="err">No puzzle scheduled for today.<br>Add one via puzzles.csv + build_puzzles.py.</div>';
+    return;
+  }
+  render();
+}
+
+function getTodayPacificString(){
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Los_Angeles', year:'numeric', month:'2-digit', day:'2-digit'
+  }).format(new Date());
+}
+
+function getVehicle(id){ return vehicles.find(v => v.id === id); }
+function getTrip(id){ return trips.find(t => t.id === id); }
+
+// Generic "how close" check for an ordered list (eras within a vehicle, or trips timeline)
+function proximity(guessId, answerId, orderedList){
+  const gi = orderedList.findIndex(x => x.id === guessId);
+  const ai = orderedList.findIndex(x => x.id === answerId);
+  if(gi === ai) return { status:'ok', arrow:'' };
+  const dist = Math.abs(gi - ai);
+  const arrow = gi < ai ? '\u2192 later' : '\u2190 earlier';
+  if(dist === 1) return { status:'close', arrow };
+  return { status:'bad', arrow };
+}
+
+function render(){
+  const zoomIdx = Math.min(guessCount, ZOOM_SCALES.length - 1);
+  const scale = ZOOM_SCALES[zoomIdx];
+  const answerVehicle = getVehicle(puzzle.vehicleId);
+
+  document.getElementById('game').innerHTML = `
+    <div class="frame">
+      <img id="carImg" src="${puzzle.image}" style="transform:translate(-50%,-50%) scale(${scale});transform-origin:${puzzle.focusX}% ${puzzle.focusY}%;">
+    </div>
+    <div class="guess-tally">
+      ${Array.from({length:MAX_GUESSES}).map((_,i)=>`<div class="dot ${i < guessCount ? 'used':''}"></div>`).join('')}
+      <span style="margin-left:6px;">${guessCount}/${MAX_GUESSES} guesses</span>
+    </div>
+
+    <div class="field">
+      <label>Vehicle</label>
+      <div class="row">
+        <select id="input_vehicle" ${solved.vehicle ? 'disabled':''}>
+          <option value="">— choose —</option>
+          ${vehicles.map(v => `<option value="${v.id}" ${solved.vehicle && v.id===puzzle.vehicleId ? 'selected':''}>${v.label}</option>`).join('')}
+        </select>
+        <div class="result-tag empty" id="tag_vehicle">—</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Era</label>
+      <div class="row">
+        <select id="input_era" ${solved.era || !answerVehicle ? 'disabled':''}>
+          <option value="">— choose vehicle first —</option>
+          ${answerVehicle ? answerVehicle.eras.map(e => `<option value="${e.id}" ${solved.era && e.id===puzzle.eraId ? 'selected':''}>${e.label}</option>`).join('') : ''}
+        </select>
+        <div class="result-tag empty" id="tag_era">—</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Trip / Location</label>
+      <div class="row">
+        <select id="input_trip" ${solved.trip ? 'disabled':''}>
+          <option value="">— choose —</option>
+          ${trips.map(t => `<option value="${t.id}" ${solved.trip && t.id===puzzle.tripId ? 'selected':''}>${t.label}</option>`).join('')}
+        </select>
+        <div class="result-tag empty" id="tag_trip">—</div>
+      </div>
+    </div>
+
+    <button id="guessBtn" ${allSolved() ? 'disabled':''}>Submit Guess</button>
+    <div class="history" id="historyBox"></div>
+    <div class="reveal" id="revealBox"></div>
+  `;
+
+  const vSel = document.getElementById('input_vehicle');
+  vSel.addEventListener('change', () => {
+    const v = getVehicle(vSel.value);
+    const eraSel = document.getElementById('input_era');
+    eraSel.disabled = !v;
+    eraSel.innerHTML = '<option value="">— choose —</option>' + (v ? v.eras.map(e=>`<option value="${e.id}">${e.label}</option>`).join('') : '');
+  });
+
+  renderHistory();
+  document.getElementById('guessBtn').addEventListener('click', submitGuess);
+  if(guessCount >= MAX_GUESSES || allSolved()) endGame();
+}
+
+function allSolved(){ return solved.vehicle && solved.era && solved.trip; }
+
+function submitGuess(){
+  if(guessCount >= MAX_GUESSES || allSolved()) return;
+  const round = {};
+
+  if(solved.vehicle){ round.vehicle = {status:'ok'}; }
+  else {
+    const val = document.getElementById('input_vehicle').value;
+    if(!val){ round.vehicle = {status:'bad'}; }
+    else if(val === puzzle.vehicleId){
+      solved.vehicle = true; solvedAtGuess.vehicle = guessCount + 1;
+      round.vehicle = {status:'ok'};
+    } else {
+      const guessedOwner = getVehicle(val)?.owner;
+      const answerOwner = getVehicle(puzzle.vehicleId)?.owner;
+      round.vehicle = { status: guessedOwner === answerOwner ? 'close' : 'bad' };
+    }
+  }
+
+  if(solved.era){ round.era = {status:'ok'}; }
+  else {
+    const val = document.getElementById('input_era').value;
+    const answerVehicle = getVehicle(puzzle.vehicleId);
+    if(!val){ round.era = {status:'bad'}; }
+    else {
+      const p = proximity(val, puzzle.eraId, answerVehicle.eras);
+      if(p.status === 'ok'){ solved.era = true; solvedAtGuess.era = guessCount + 1; }
+      round.era = p;
+    }
+  }
+
+  if(solved.trip){ round.trip = {status:'ok'}; }
+  else {
+    const val = document.getElementById('input_trip').value;
+    if(!val){ round.trip = {status:'bad'}; }
+    else {
+      const p = proximity(val, puzzle.tripId, trips);
+      if(p.status === 'ok'){ solved.trip = true; solvedAtGuess.trip = guessCount + 1; }
+      round.trip = p;
+    }
+  }
+
+  ['vehicle','era','trip'].forEach(key=>{
+    const tag = document.getElementById('tag_'+key);
+    const r = round[key];
+    const label = r.status === 'ok' ? 'Correct' : r.status === 'close' ? ('Close ' + (r.arrow||'')) : 'Try again';
+    tag.textContent = label;
+    tag.className = 'result-tag ' + r.status;
+  });
+
+  history.push(round);
+  guessCount++;
+  render();
+}
+
+function renderHistory(){
+  const box = document.getElementById('historyBox');
+  if(!box) return;
+  box.innerHTML = history.map((r,i)=>`
+    <div class="history-row">
+      <span>${i+1}</span>
+      <span class="${r.vehicle.status}">${r.vehicle.status==='ok'?'\u2713':r.vehicle.status==='close'?'~':'\u2717'} vehicle</span>
+      <span class="${r.era.status}">${r.era.status==='ok'?'\u2713':r.era.status==='close'?'~':'\u2717'} era</span>
+      <span class="${r.trip.status}">${r.trip.status==='ok'?'\u2713':r.trip.status==='close'?'~':'\u2717'} trip</span>
+    </div>`).join('');
+}
+
+// Cardle-style scoring: each field scores (6 - guessNumberSolvedOn), 0 if never solved. Max 15.
+function computeScore(){
+  let total = 0;
+  ['vehicle','era','trip'].forEach(key=>{
+    if(solvedAtGuess[key]) total += (6 - solvedAtGuess[key]);
+  });
+  return total;
+}
+
+function endGame(){
+  document.getElementById('guessBtn').disabled = true;
+  const box = document.getElementById('revealBox');
+  box.style.display = 'block';
+  document.getElementById('carImg').style.transform = 'translate(-50%,-50%) scale(1)';
+
+  const won = allSolved();
+  const score = computeScore();
+  const grid = history.map(r =>
+    ['vehicle','era','trip'].map(k => r[k].status==='ok' ? '\u{1F7E9}' : r[k].status==='close' ? '\u{1F7E8}' : '\u{1F7E5}').join('')
+  ).join('\n');
+
+  const av = getVehicle(puzzle.vehicleId);
+  const ae = av.eras.find(e => e.id === puzzle.eraId);
+  const at = getTrip(puzzle.tripId);
+
+  box.innerHTML = `
+    <h2>${won ? 'Solved' : 'Answer revealed'}</h2>
+    <div>${av.label} — ${ae.label} — ${at.label}</div>
+    <div class="score">${score} / 15 pts</div>
+    <div class="share">${grid.replace(/\n/g,'<br>')}</div>
+    <button id="copyBtn">Copy result</button>
+  `;
+  document.getElementById('copyBtn').addEventListener('click', ()=>{
+    const text = `Trailguess ${puzzle.date} — ${score}/15\n${grid}`;
+    navigator.clipboard.writeText(text);
+    document.getElementById('copyBtn').textContent = 'Copied!';
+  });
+}
+
+init();
+</script>
+</body>
+</html>

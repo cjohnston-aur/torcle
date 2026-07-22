@@ -1,0 +1,32 @@
+{
+  "resetTimeZone": "America/Los_Angeles",
+  "puzzles": [
+    {
+      "date": "2026-07-22",
+      "image": "images/Juans_Truck-Stock-Letts_Lake.png",
+      "focusX": 50.0,
+      "focusY": 55.0,
+      "vehicleId": "juan_truck",
+      "eraId": "stock",
+      "tripId": "letts_lake_2019"
+    },
+    {
+      "date": "2026-07-23",
+      "image": "images/2026-07-23.jpg",
+      "focusX": 40.0,
+      "focusY": 50.0,
+      "vehicleId": "juan_truck",
+      "eraId": "ls_swap",
+      "tripId": "playa_2020"
+    },
+    {
+      "date": "2026-07-24",
+      "image": "images/2026-07-24.jpg",
+      "focusX": 60.0,
+      "focusY": 45.0,
+      "vehicleId": "clay_4runner",
+      "eraId": "lift",
+      "tripId": "sierra_2021"
+    }
+  ]
+}

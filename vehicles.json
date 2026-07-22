@@ -1,0 +1,22 @@
+[
+  {
+    "id": "juan_truck",
+    "owner": "Juan",
+    "label": "Juan's Truck",
+    "eras": [
+      { "id": "stock", "label": "Stock" },
+      { "id": "ls_swap", "label": "After LS Swap" },
+      { "id": "bullbar", "label": "After Bullbar" }
+    ]
+  },
+  {
+    "id": "clay_4runner",
+    "owner": "Clay",
+    "label": "Clay's 4Runner",
+    "eras": [
+      { "id": "y2001", "label": "2001 (original)" },
+      { "id": "lift", "label": "After Lift Kit" },
+      { "id": "rooftop_tent", "label": "After Rooftop Tent" }
+    ]
+  }
+]
