@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trailguess — Daily Camping Rig Guesser</title>
+<title>TORCle — Daily Camping Rig Guesser</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -191,7 +191,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Trailguess</h1>
+    <h1>TORCle</h1>
     <div class="sub" id="dateLabel">— loading —</div>
   </header>
   <div id="game"></div>
@@ -412,7 +412,7 @@ function endGame(){
     <button id="copyBtn">Copy result</button>
   `;
   document.getElementById('copyBtn').addEventListener('click', ()=>{
-    const text = `Trailguess ${puzzle.date} — ${score}/15\n${grid}`;
+    const text = `TORCle ${puzzle.date} — ${score}/15\n${grid}`;
     navigator.clipboard.writeText(text);
     document.getElementById('copyBtn').textContent = 'Copied!';
   });
