@@ -5,40 +5,18 @@
     "label": "Juan's Truck",
     "eras": [
       { "id": "stock", "label": "Stock" },
-      { "id": "ls_swap", "label": "Post Suspension Rebuild" },
-      { "id": "camper", "label": "With Camper" }
-      { "id": "ghetto", "label": "Ghetto respray" }
-      { "id": "bullbar", "label": "Post-Bullbar" }
-      { "id": "next", "label": "What's next?" }
+      { "id": "ls_swap", "label": "After LS Swap" },
+      { "id": "bullbar", "label": "After Bullbar" }
     ]
   },
   {
-    "id": "clay_wj",
+    "id": "clay_4runner",
     "owner": "Clay",
-    "label": "WJ",
+    "label": "Clay's 4Runner",
     "eras": [
-      { "id": "2019", "label": "Original" },
-      { "id": "rtt", "label": "Roof-top Tent" },
-      { "id": "bumper", "label": "After Bumper upgrade" }
-    ]
-  }
-  {
-    "id": "charlie_xj",
-    "owner": "Charlie",
-    "label": "SexJ",
-    "eras": [
-      { "id": "y2001", "label": "Original" },
-      { "id": "lift", "label": "LS Swapped" },
-    ]
-  }
-  {
-    "id": "Perry_f250",
-    "owner": "Perry",
-    "label": "F250",
-    "eras": [
-      { "id": "Original", "label": "Original" },
-      { "id": "Era-1", "label": "Alaskan Camper" },
-      { "id": "Era-2", "label": "Moto-hauler" }
+      { "id": "y2001", "label": "2001 (original)" },
+      { "id": "lift", "label": "After Lift Kit" },
+      { "id": "rooftop_tent", "label": "After Rooftop Tent" }
     ]
   }
 ]
